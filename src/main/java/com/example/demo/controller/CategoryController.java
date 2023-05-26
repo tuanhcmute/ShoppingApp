@@ -1,11 +1,11 @@
-package com.example.demo.controllers;
+package com.example.demo.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,37 +13,37 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.entities.Category;
-import com.example.demo.models.ResponseObject;
-import com.example.demo.repositories.CategoryRepository;
-import com.example.demo.utils.Constants;
+import com.example.demo.dto.CategoryDto;
+import com.example.demo.dto.ResponseObject;
+import com.example.demo.expection.InternalServerException;
+import com.example.demo.model.Category;
+import com.example.demo.repository.CategoryRepository;
+import com.example.demo.service.CategoryService;
+import com.example.demo.util.Constants;
 
 
 @RestController
 @RequestMapping(path = Constants.PREFIX_URL + "/categories")
 public class CategoryController {
-	
 	@Autowired
 	CategoryRepository categoryRepository;
+	
+	@Autowired
+	CategoryService categoryService;
 
 	@GetMapping("")
 	ResponseEntity<ResponseObject> getAllCategories() {
 		String status = "";
 		String message = "";
-		List<Category> categories = null;
 		try {
 			status = Constants.STATUS_OK;
 			message = "Get all categories successfully";
-			categories = categoryRepository.findAll();
+			List<CategoryDto> categorDtos = categoryService.findAll();
 			return ResponseEntity.status(HttpStatus.OK).body(
-				new ResponseObject(status, message, categories)
+				new ResponseObject(status, message, categorDtos)
 			);
 		} catch (Exception e) {
-			status = Constants.STATUS_OK;
-			message = e.getMessage();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-				new ResponseObject(status, message, categories)
-			);
+			throw new InternalAuthenticationServiceException(e.getMessage());
 		}
 	}
 	
@@ -59,23 +59,19 @@ public class CategoryController {
 					new ResponseObject(status, message, null)
 				);
 			}
-			Optional<Category> category = categoryRepository.findById(id);
-			if(category.isPresent()) {
+			CategoryDto categoryDto = categoryService.findById(id);
+			if(categoryDto != null) {
 				message = "Get category by id successfully";
 				return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject(status, message, category)
+					new ResponseObject(status, message, categoryDto)
 				);
 			}
 			message = "Can not find category with id = " + id;
 			return ResponseEntity.status(HttpStatus.OK).body(
-				new ResponseObject(status, message, category)
-			);
-		} catch (Exception e) {
-			status = Constants.STATUS_FAIL;
-			message = e.getMessage();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
 				new ResponseObject(status, message, null)
 			);
+		} catch (Exception e) {
+			throw new InternalServerException(e.getMessage());
 		}
 	}
 	@PostMapping("/upsert")
@@ -115,11 +111,7 @@ public class CategoryController {
 					new ResponseObject(status, message, categorySaved)
 			);
 		} catch (Exception e) {
-			status = Constants.STATUS_FAIL;
-			message = e.getMessage();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-					new ResponseObject(status, message, categorySaved)
-			);
+			throw new InternalServerException(e.getMessage());
 		}
 	}
 }

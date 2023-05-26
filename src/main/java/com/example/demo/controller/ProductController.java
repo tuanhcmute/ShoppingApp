@@ -1,5 +1,6 @@
-package com.example.demo.controllers;
+package com.example.demo.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,14 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.entities.Category;
-import com.example.demo.entities.Product;
-import com.example.demo.models.ProductRequest;
-import com.example.demo.models.ResponseObject;
-import com.example.demo.repositories.CategoryRepository;
-import com.example.demo.repositories.ProductRepository;
-import com.example.demo.utils.Constants;
-
+import com.example.demo.dto.ProductDto;
+import com.example.demo.dto.ResponseObject;
+import com.example.demo.mapper.ProductMapper;
+import com.example.demo.model.Category;
+import com.example.demo.model.Product;
+import com.example.demo.repository.CategoryRepository;
+import com.example.demo.repository.ProductRepository;
+import com.example.demo.util.Constants;
 
 @RestController
 @RequestMapping(path = Constants.PREFIX_URL + "/products")
@@ -47,9 +48,10 @@ public class ProductController {
 			}
 			Optional<Product> product = productRepository.findById(id);
 			if(product.isPresent()) {
+				ProductDto productDto = ProductMapper.toDto(product.get());
 				message = "Get product by id successfully";
 				return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject(status, message, product)
+					new ResponseObject(status, message, productDto)
 				);
 			}
 			message = "Can not find product with id = " + id;
@@ -66,7 +68,7 @@ public class ProductController {
 	}
 	
 	@PostMapping(value = "/upsert", produces = {MediaType.APPLICATION_JSON_VALUE})
-	ResponseEntity<ResponseObject> upsertProduct(@RequestBody ProductRequest product) {
+	ResponseEntity<ResponseObject> upsertProduct(@RequestBody ProductDto product) {
 		String status = "";
 		String message = "";
 		Product productSaved = null;
@@ -90,7 +92,7 @@ public class ProductController {
 						new ResponseObject(status, message, productSaved)
 				);
 			}
-			Category foundCategory = categoryRepository.getCategoryById(product.getCategoryId());
+			Category foundCategory = categoryRepository.findById(product.getCategoryId()).get();
 			if(foundCategory == null) {
 				message = "Category is not exist";
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -140,7 +142,11 @@ public class ProductController {
 					new ResponseObject(status, message, null)
 				);
 			}
-			List<Product> products = productRepository.findByCategoryId(categoryId);
+			List<Product> products = productRepository.findByCategoryId(categoryId);			
+			List<ProductDto> productDtos = new ArrayList<>();
+			for (Product product : products) {
+				productDtos.add(ProductMapper.toDto(product));
+			}
 			if(products == null) {
 				message = "Category id is not exist";
 				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
@@ -148,7 +154,7 @@ public class ProductController {
 				);
 			}
 			return ResponseEntity.status(HttpStatus.OK).body(
-				new ResponseObject(status, message, products)
+				new ResponseObject(status, message, productDtos)
 			);
 		} catch (Exception e) {
 			message = e.getMessage();

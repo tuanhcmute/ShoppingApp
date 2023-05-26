@@ -1,4 +1,4 @@
-package com.example.demo.utils;
+package com.example.demo.util;
 
 public class Constants {
 	public static final String STATUS_OK = "ok";

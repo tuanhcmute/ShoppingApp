@@ -1,4 +1,4 @@
-package com.example.demo.entities;
+package com.example.demo.model;
 
 import java.io.Serializable;
 					
@@ -13,9 +13,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "tblcategory")
+@Data // Auto generate getter, setter, toString, hasCode, equals
+@NoArgsConstructor
+@AllArgsConstructor
 public class Category implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -31,20 +37,6 @@ public class Category implements Serializable {
 		this.name = name;
 	}
 
-	public Category() {
-	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
 	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
 	List<Product> products = new ArrayList<>();
 	
@@ -60,14 +52,12 @@ public class Category implements Serializable {
 	public Product addProduct(Product product) {
 		getProducts().add(product);
 		product.setCategory(this);
-
 		return product;
 	}
 
 	public Product removeProduct(Product product) {
 		getProducts().remove(product);
 		product.setCategory(null);
-
 		return product;
 	}
 	
