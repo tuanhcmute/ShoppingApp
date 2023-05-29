@@ -12,6 +12,8 @@ import com.example.demo.mapper.CategoryMapper;
 import com.example.demo.model.Category;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.service.CategoryService;
+import com.example.demo.util.IdUtil;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -35,5 +37,20 @@ public class CategoryServiceImpl implements CategoryService {
 		 if(category.isPresent()) 
 			 return CategoryMapper.toDto(category.get());
 		 return null;
+	}
+
+	@Override
+	public CategoryDto upsert(Category category) {
+		Category cate = categoryRepository.findById(category.getId())
+		.map(c -> {
+			c.setName(category.getName());
+			return categoryRepository.save(c);
+		}).orElseGet(() -> {
+			Category c = Category.builder()
+								.id(IdUtil.generatedId())
+								.name(category.getName()).build();
+			return categoryRepository.save(c);
+		});
+		return CategoryMapper.toDto(cate);
 	}
 }

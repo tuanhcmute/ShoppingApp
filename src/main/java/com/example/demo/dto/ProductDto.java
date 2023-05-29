@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // Generate default constructor
 @Builder
 public class ProductDto {
-	String id;
-	String name;
-	String urlImage;
-	String description;
-	String categoryId;
-	Long available;
-	Long price;
-	boolean isActive;
+	private String id;
+	private String name;
+	private String urlImage;
+	private String description;
+	private String categoryId;
+	private Long available;
+	private Long price;
+	private boolean isActive;
 }

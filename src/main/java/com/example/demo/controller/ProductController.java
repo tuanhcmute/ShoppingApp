@@ -1,9 +1,9 @@
 package com.example.demo.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,152 +16,129 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.CategoryDto;
 import com.example.demo.dto.ProductDto;
 import com.example.demo.dto.ResponseObject;
-import com.example.demo.mapper.ProductMapper;
-import com.example.demo.model.Category;
-import com.example.demo.model.Product;
-import com.example.demo.repository.CategoryRepository;
-import com.example.demo.repository.ProductRepository;
-import com.example.demo.util.Constants;
+import com.example.demo.expection.InternalServerException;
+import com.example.demo.service.CategoryService;
+import com.example.demo.service.ProductService;
+import com.example.demo.util.HttpStatusUtil;
+import com.example.demo.util.PathUtil;
 
 @RestController
-@RequestMapping(path = Constants.PREFIX_URL + "/products")
+@RequestMapping(path = PathUtil.PREFIX_URL + "/products")
 public class ProductController {
-	@Autowired
-	ProductRepository productRepository;	
+	
+	private final Logger logger = LoggerFactory.getLogger(ProductController.class);
 	
 	@Autowired
-	CategoryRepository categoryRepository;
+	ProductService productService;
+	
+	@Autowired
+	CategoryService categoryService;
 
 	@GetMapping("/{id}")
 	ResponseEntity<ResponseObject> findById(@PathVariable String id) {
-		String status = "";
-		String message = "";
 		try {
-			status = Constants.STATUS_OK;
+			String status = HttpStatusUtil.OK.toString();
+			String message = "";
 			if(id.isEmpty() || id.equals("")) {
 				message = "Id is required";
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-					new ResponseObject(status, message, null)
+				logger.warn(message);
+				return ResponseEntity.status(HttpStatus.OK).body(
+					new ResponseObject(status, message, "")
 				);
 			}
-			Optional<Product> product = productRepository.findById(id);
-			if(product.isPresent()) {
-				ProductDto productDto = ProductMapper.toDto(product.get());
+			ProductDto productDto = productService.findById(id);
+			if(productDto != null) {
 				message = "Get product by id successfully";
+				logger.info(message);
 				return ResponseEntity.status(HttpStatus.OK).body(
 					new ResponseObject(status, message, productDto)
 				);
 			}
 			message = "Can not find product with id = " + id;
+			logger.warn(message);
 			return ResponseEntity.status(HttpStatus.OK).body(
-				new ResponseObject(status, message, product)
+				new ResponseObject(status, message, "")
 			);
 		} catch (Exception e) {
-			status = Constants.STATUS_FAIL;
-			message = e.getMessage();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-				new ResponseObject(status, message, null)
-			);
+			logger.error(e.getMessage());
+			throw new InternalServerException(e.getMessage());
 		}
 	}
 	
 	@PostMapping(value = "/upsert", produces = {MediaType.APPLICATION_JSON_VALUE})
 	ResponseEntity<ResponseObject> upsertProduct(@RequestBody ProductDto product) {
-		String status = "";
-		String message = "";
-		Product productSaved = null;
 		try {
-			status = Constants.STATUS_OK;
+			String status = HttpStatusUtil.OK.toString();
+			String message = "";
 			if(product.getId().isEmpty() || product.getId().equals("")) {
 				message = "Product id is required";
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-						new ResponseObject(status, message, productSaved)
+				return ResponseEntity.status(HttpStatus.OK).body(
+						new ResponseObject(status, message, "")
 				);
 			}
 			if(product.getName().isEmpty() || product.getName().equals("")) {
 				message = "Product name is required";
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-						new ResponseObject(status, message, productSaved)
+				return ResponseEntity.status(HttpStatus.OK).body(
+						new ResponseObject(status, message, "")
 				);
 			}
 			if(product.getCategoryId().isEmpty() || product.getCategoryId().equals("")) {
 				message = "Category id is required";
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-						new ResponseObject(status, message, productSaved)
+				return ResponseEntity.status(HttpStatus.OK).body(
+						new ResponseObject(status, message, "")
 				);
 			}
-			Category foundCategory = categoryRepository.findById(product.getCategoryId()).get();
+			CategoryDto foundCategory = categoryService.findById(product.getCategoryId());
 			if(foundCategory == null) {
 				message = "Category is not exist";
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-						new ResponseObject(status, message, productSaved)
+				return ResponseEntity.status(HttpStatus.OK).body(
+						new ResponseObject(status, message, "")
 				);
 			}
-			productSaved = productRepository.findById(product.getId().trim())
-					.map(p -> {
-						p.setName(product.getName());
-						p.setActive(product.isActive());
-						p.setDescription(product.getDescription());
-						p.setUrlImage(product.getUrlImage());
-						return productRepository.save(p);
-					})
-					.orElseGet(() -> {
-						Product p = new Product();
-						p.setId(product.getId());
-						p.setName(product.getName());
-						p.setActive(product.isActive());
-						p.setDescription(product.getDescription());
-						p.setUrlImage(product.getUrlImage());
-						p.setCategory(foundCategory);
-						return productRepository.save(p);
-					});
+			// Nếu tìm product tồn tại thì tiến hành update, còn không tồn tại thì tiến hành tạo mới
+			ProductDto productDto = productService.upsert(product);
 			message = "Create product successfully";
+			logger.info(message);
 			return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject(status, message, productSaved)
+					new ResponseObject(status, message, productDto)
 			);
 		} catch (Exception e) {
-			message = e.getMessage();
-			status = Constants.STATUS_FAIL;
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-					new ResponseObject(status, message, productSaved)
-			);
+			throw new InternalServerException(e.getMessage());
 		}
 	}
 
 	@GetMapping(value = "", produces = {MediaType.APPLICATION_JSON_VALUE})
 	ResponseEntity<ResponseObject> findByCategoryId(@RequestParam("category_id") String categoryId) {
-		String status = "";
-		String message = "";
 		try {
-				status = Constants.STATUS_OK;
+			String status = HttpStatusUtil.OK.toString();
+			String message = "";
 			if(categoryId.isEmpty() || categoryId.equals("")) {
 				message = "Category id is required";
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-					new ResponseObject(status, message, null)
+				logger.warn(message);
+				return ResponseEntity.status(HttpStatus.OK).body(
+					new ResponseObject(status, message, "")
 				);
 			}
-			List<Product> products = productRepository.findByCategoryId(categoryId);			
-			List<ProductDto> productDtos = new ArrayList<>();
-			for (Product product : products) {
-				productDtos.add(ProductMapper.toDto(product));
-			}
+
+			List<ProductDto> products = productService.findByCategoryId(categoryId);			
 			if(products == null) {
 				message = "Category id is not exist";
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
-					new ResponseObject(status, message, null)
+				logger.warn(message);
+				return ResponseEntity.status(HttpStatus.OK).body(
+					new ResponseObject(status, message, "")
 				);
 			}
+
+			message = "Find products by category successfully";
 			return ResponseEntity.status(HttpStatus.OK).body(
-				new ResponseObject(status, message, productDtos)
+				new ResponseObject(status, message, products)
 			);
 		} catch (Exception e) {
-			message = e.getMessage();
-			status = Constants.STATUS_FAIL;
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-					new ResponseObject(status, message, null)
-			);
+			logger.error(e.getMessage());
+			throw new InternalServerException(e.getMessage());
 		}
 	}
 }

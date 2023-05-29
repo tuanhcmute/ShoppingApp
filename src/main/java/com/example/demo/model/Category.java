@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +23,7 @@ import lombok.NoArgsConstructor;
 @Data // Auto generate getter, setter, toString, hasCode, equals
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Category implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -31,12 +33,6 @@ public class Category implements Serializable {
 	@Column(nullable = false, unique = true)
 	String name;
 	
-	public Category(String id, String name) {
-		super();
-		this.id = id;
-		this.name = name;
-	}
-
 	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
 	List<Product> products = new ArrayList<>();
 	
