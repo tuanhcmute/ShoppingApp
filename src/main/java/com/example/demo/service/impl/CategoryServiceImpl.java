@@ -13,7 +13,6 @@ import com.example.demo.model.Category;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.service.CategoryService;
 import com.example.demo.util.IdUtil;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {

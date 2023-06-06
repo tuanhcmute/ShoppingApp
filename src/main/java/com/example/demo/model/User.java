@@ -1,7 +1,6 @@
 package com.example.demo.model;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -12,11 +11,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Data;
 
 @Entity
 @Data
 @Table(name = "tbluser")
+@Builder
 public class User implements Serializable{
 	private static final long serialVersionUID = 1L;
 
@@ -37,5 +38,6 @@ public class User implements Serializable{
 	@JoinTable(name = "user_role", 
 		joinColumns = @JoinColumn(name = "user_id"), 
 		inverseJoinColumns = @JoinColumn(name = "role_id"))
-	Set<Role> roles = new HashSet<>();
+//	Set<Role> roles = new HashSet<>();
+	Set<Role> roles;
 }

@@ -63,7 +63,6 @@ public class RoleController {
 					new ResponseObject(status, message, "")
 				);
 			}
-			LOGGER.warn(role.getName());
 			if(role.getId() == null || role.getId().equals("")) {
 				message = "Role id is required";
 				LOGGER.warn(message);

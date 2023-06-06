@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.RoleDto;
 import com.example.demo.mapper.RoleMapper;
-import com.example.demo.model.Category;
 import com.example.demo.model.Role;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.service.RoleService;

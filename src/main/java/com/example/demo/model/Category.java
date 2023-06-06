@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.ArrayList;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,7 +33,8 @@ public class Category implements Serializable {
 	String name;
 	
 	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-	List<Product> products = new ArrayList<>();
+	List<Product> products;
+//	List<Product> products = new ArrayList<>();
 	
 	@JsonIgnore
 	public List<Product> getProducts() {

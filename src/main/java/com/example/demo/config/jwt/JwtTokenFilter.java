@@ -24,7 +24,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		try {
 			String token = getToken(request);
-			
+			LOGGER.info(token);
 			
 		} catch (Exception e) {
 		}
