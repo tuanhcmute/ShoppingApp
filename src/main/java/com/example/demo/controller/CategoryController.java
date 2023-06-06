@@ -20,6 +20,7 @@ import com.example.demo.dto.ResponseObject;
 import com.example.demo.expection.InternalServerException;
 import com.example.demo.model.Category;
 import com.example.demo.service.CategoryService;
+import com.example.demo.util.HttpStatusCodeUtil;
 import com.example.demo.util.HttpStatusUtil;
 import com.example.demo.util.PathUtil;
 
@@ -42,7 +43,12 @@ public class CategoryController {
 			List<CategoryDto> categorDtos = categoryService.findAll();
 			logger.info(message);
 			return ResponseEntity.status(HttpStatus.OK).body(
-				new ResponseObject(status, message, categorDtos)
+					ResponseObject.builder()
+					.status(status)
+					.message(message)
+					.statusCode(HttpStatusCodeUtil.OK)
+					.data(categorDtos)
+					.build()
 			);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -54,12 +60,16 @@ public class CategoryController {
 	ResponseEntity<ResponseObject> findById(@PathVariable String id) {
 		try {
 			String message = "";
-			String status = HttpStatusUtil.OK.toString();
 			if(id.isEmpty() || id.equals("")) {
 				message = "Id is required";
 				logger.warn(message);
-				return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject(status, message, "")
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+					ResponseObject.builder()
+						.status(HttpStatusUtil.BAD_REQUEST.toString())
+						.message(message)
+						.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+						.data("")
+						.build()
 				);
 			}
 			// Lấy category theo id
@@ -68,13 +78,23 @@ public class CategoryController {
 				message = "Get category by id successfully";
 				logger.info(message);
 				return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject(status, message, categoryDto)
+					ResponseObject.builder()
+					.status(HttpStatusUtil.OK.toString())
+					.message(message)
+					.statusCode(HttpStatusCodeUtil.OK)
+					.data(categoryDto)
+					.build()
 				);
 			}
 			message = "Can not find category with id = " + id;
 			logger.warn(message);
-			return ResponseEntity.status(HttpStatus.OK).body(
-				new ResponseObject(status, message, "")
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+					ResponseObject.builder()
+					.status(HttpStatusUtil.NOT_FOUND.toString())
+					.message(message)
+					.statusCode(HttpStatusCodeUtil.NOT_FOUND)
+					.data("")
+					.build()
 			);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -86,34 +106,53 @@ public class CategoryController {
 	ResponseEntity<ResponseObject> upsertCategory(@RequestBody Category category) {
 		try {
 			String message = "";
-			String status = HttpStatusUtil.OK.toString();
 			if(category == null) {
 				message = "Category cannot null";
 				logger.warn(message);
-				return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject(status, message, "")
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+					ResponseObject.builder()
+					.status(HttpStatusUtil.BAD_REQUEST.toString())
+					.message(message)
+					.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+					.data("")
+					.build()
 				);
 			}
 			if(category.getId().isEmpty() || category.getId().equals("")) {
 				message = "Category id is required";
 				logger.warn(message);
-				return ResponseEntity.status(HttpStatus.OK).body(
-						new ResponseObject(status, message, "")
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+						ResponseObject.builder()
+						.status(HttpStatusUtil.BAD_REQUEST.toString())
+						.message(message)
+						.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+						.data("")
+						.build()
 					);
 			}
 			if(category.getName().isEmpty() || category.getName().equals("")) {
 				message = "Category name is required";
 				logger.warn(message);
-				return ResponseEntity.status(HttpStatus.OK).body(
-						new ResponseObject(status, message, "")
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+						ResponseObject.builder()
+						.status(HttpStatusUtil.BAD_REQUEST.toString())
+						.message(message)
+						.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+						.data("")
+						.build()
 				);
 			}
 			// Nếu trùng thì update, không trùng thì tiến hành create
 			CategoryDto categorySaved = categoryService.upsert(category);
-			message = "Create product successfully";
+			message = "Upsert category successfully";
 			logger.info(message);
 			return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject(status, message, categorySaved)
+					ResponseObject.builder()
+					.status(HttpStatusUtil.OK.toString())
+					.message(message)
+					.statusCode(HttpStatusCodeUtil.OK)
+					.data(categorySaved)
+					.build()
 			);
 		} catch (Exception e) {
 			logger.error(e.getMessage());

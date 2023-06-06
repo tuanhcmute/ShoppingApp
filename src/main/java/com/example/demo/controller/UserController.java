@@ -18,6 +18,7 @@ import com.example.demo.dto.UserDto;
 import com.example.demo.expection.InternalServerException;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
+import com.example.demo.util.HttpStatusCodeUtil;
 import com.example.demo.util.HttpStatusUtil;
 import com.example.demo.util.PathUtil;
 
@@ -34,13 +35,17 @@ public class UserController {
 	@GetMapping("")
 	ResponseEntity<ResponseObject> findAll() {
 		try {
-			String status = HttpStatusUtil.OK.toString();
 			String message = "Get all user successfully";
-			// Lấy tất cả category
+			// Lấy tất cả user
 			List<UserDto> userDtos = userService.findAll();
 			LOGGER.info(message);
 			return ResponseEntity.status(HttpStatus.OK).body(
-				new ResponseObject(status, message, userDtos)
+				ResponseObject.builder()
+				.status(HttpStatusUtil.OK.toString())
+				.message(message)
+				.statusCode(HttpStatusCodeUtil.OK)
+				.data(userDtos)
+				.build()
 			);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());

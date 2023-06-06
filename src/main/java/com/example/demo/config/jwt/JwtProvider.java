@@ -7,23 +7,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.model.CustomUserDetails;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
+// Class này thực hiện các công việc tạo token, validate token, get email(username từ token)
 public class JwtProvider {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JwtProvider.class);
 	
-	private String jwtSecret = "doduongthaituan";
-	private int jwtExpiration = 86400;
+	private final String jwtSecret = "1ac8dde22c6b454da0923af29afd67bf";
+	private final int jwtExpiration = 86400; // 1 day
 	
 	public String createToken(Authentication authentication) {
-		String username = "admin";
+		// Thực hiện lấy user từ hệ thống
+		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+		
+		// Build accessToken
 		String accessToken =  Jwts.builder()
-				.setSubject(username)
+				.setSubject(customUserDetails.getEmail())
 				.setIssuedAt(new Date())
 				// Set thời gian sống
-				.setExpiration(new Date(new Date().getTime() + jwtExpiration * 1000))
+				.setExpiration(new Date(new Date().getTime() + jwtExpiration * 1000)) // 1 day
 				.signWith(SignatureAlgorithm.HS256, jwtSecret)
 				.compact();
 		LOGGER.info(accessToken);

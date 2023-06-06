@@ -18,9 +18,9 @@ import com.example.demo.dto.ResponseObject;
 import com.example.demo.dto.RoleDto;
 import com.example.demo.expection.InternalServerException;
 import com.example.demo.service.RoleService;
+import com.example.demo.util.HttpStatusCodeUtil;
 import com.example.demo.util.HttpStatusUtil;
 import com.example.demo.util.PathUtil;
-
 
 
 @RestController
@@ -38,13 +38,23 @@ public class RoleController {
 			List<RoleDto> roleDtos = roleService.findAll();
 			String message = "Get All roles successfully";
 			LOGGER.info(message);
-			return ResponseEntity.status(HttpStatus.OK).body(
-					ResponseObject.builder()
+			return roleDtos != null 
+					?
+					ResponseEntity.status(HttpStatus.OK).body(
+								ResponseObject.builder()
 									.status(HttpStatusUtil.OK.toString())
+									.statusCode(HttpStatusCodeUtil.OK)
 									.message(message)
-									.data(roleDtos == null ? "" : roleDtos)
-									.build()
-					);
+									.data(roleDtos)
+									.build())
+					: 
+					ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+								ResponseObject.builder()
+									.status(HttpStatusUtil.NO_CONTENT.toString())
+									.statusCode(HttpStatusCodeUtil.NO_CONTENT)
+									.message(message)
+									.data("")
+									.build());
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());
 			throw new InternalServerException(e.getMessage());
@@ -53,36 +63,55 @@ public class RoleController {
 	
 	@PostMapping(value = "/upsert", produces = {MediaType.APPLICATION_JSON_VALUE})
 	ResponseEntity<ResponseObject> upsertRole(@RequestBody RoleDto role) {
+		String message = "";
 		try {
-			String message = "";
-			String status = HttpStatusUtil.OK.toString();
 			if(role == null) {
 				message = "Role cannot null";
 				LOGGER.warn(message);
-				return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject(status, message, "")
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+					ResponseObject.builder()
+					.status(HttpStatusUtil.BAD_REQUEST.toString())
+					.message(message)
+					.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+					.data("")
+					.build()
 				);
 			}
 			if(role.getId() == null || role.getId().equals("")) {
 				message = "Role id is required";
 				LOGGER.warn(message);
-				return ResponseEntity.status(HttpStatus.OK).body(
-						new ResponseObject(status, message, "")
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+						ResponseObject.builder()
+						.status(HttpStatusUtil.BAD_REQUEST.toString())
+						.message(message)
+						.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+						.data("")
+						.build()
 					);
 			}
 			if(role.getName() == null || role.getName().equals("")) {
 				message = "Role name is required";
 				LOGGER.warn(message);
-				return ResponseEntity.status(HttpStatus.OK).body(
-						new ResponseObject(status, message, "")
-				);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+						ResponseObject.builder()
+						.status(HttpStatusUtil.BAD_REQUEST.toString())
+						.message(message)
+						.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+						.data("")
+						.build()
+					);
 			}
 			// Nếu trùng thì update, không trùng thì tiến hành create
 			RoleDto roleDto = roleService.upsert(role);
 			message = "Create role successfully";
 			LOGGER.info(message);
 			return ResponseEntity.status(HttpStatus.OK).body(
-					new ResponseObject(status, message, roleDto)
+					ResponseObject.builder()
+					.status(HttpStatusUtil.OK.toString())
+					.message(message)
+					.statusCode(HttpStatusCodeUtil.OK)
+					.data(roleDto)
+					.build()
 			);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage());

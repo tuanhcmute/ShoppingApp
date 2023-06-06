@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ResponseObject {
 	private String status;
+	private int statusCode;
 	private String message;
 	private Object data;
 }

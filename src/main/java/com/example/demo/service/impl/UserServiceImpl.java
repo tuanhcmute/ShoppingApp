@@ -47,5 +47,14 @@ public class UserServiceImpl implements UserService {
 				});
 				return UserMapper.toDto(u);
 	}
+
+	@Override
+	public UserDto findByEmail(String email) {
+		User user = userRepository.findByEmail(email);
+		if(user != null) {
+			return UserMapper.toDto(user);
+		}
+		return null;
+	}
 	
 }
