@@ -1,6 +1,10 @@
-FROM maven:3.9.2-eclipse-temurin-17-alpine
+FROM  openjdk:oraclelinux8
 
 WORKDIR /app
-COPY . .
-RUN mvn clean install
-CMD mvn spring-boot:run
+
+COPY .mvn .mvn
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline
+COPY src ./src
+EXPOSE 8080
+CMD [ "./mvnw", "spring-boot:run" ]

@@ -66,8 +66,10 @@ public class SecurityConfig {
 			// Thực hiện cho người dùng sử dụng những entrypoint bên dưới
 			.authorizeHttpRequests()
 			.requestMatchers("/api/v1/auth/**").permitAll()
-			.requestMatchers("/api/v1/users/**").hasAnyAuthority("ADMIN", "MANAGER")
-			.requestMatchers("/api/v1/roles/**").hasAnyAuthority("ADMIN")
+			// .requestMatchers("/api/v1/users/**").hasAnyAuthority("ADMIN", "MANAGER")
+			// .requestMatchers("/api/v1/roles/**").hasAnyAuthority("ADMIN")
+			.requestMatchers("/api/v1/roles/**").permitAll()
+			.requestMatchers("/api/v1/users/**").permitAll()
 			// Những enpoint khác cần phải xác thực thì mới có thể thao tác được
 			.anyRequest().authenticated()
 			.and()

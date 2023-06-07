@@ -21,6 +21,7 @@ public class LogoutHandlerImpl implements LogoutHandler {
 		if(authHeader != null && authHeader.startsWith("Bearer")) {
 			String accessToken = authHeader.replace("Bearer", "");
 			LOGGER.info(accessToken);
+			// Remove token
 		}
 		return;
 	}

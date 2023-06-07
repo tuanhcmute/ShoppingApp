@@ -47,10 +47,10 @@ public class RoleController {
 									.data(roleDtos)
 									.build())
 					: 
-					ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+					ResponseEntity.status(HttpStatus.NOT_FOUND).body(
 								ResponseObject.builder()
-									.status(HttpStatusUtil.NO_CONTENT.toString())
-									.statusCode(HttpStatusUtil.NO_CONTENT.getValue())
+									.status(HttpStatusUtil.NOT_FOUND.toString())
+									.statusCode(HttpStatusUtil.NOT_FOUND.getValue())
 									.message(message)
 									.data("")
 									.build());
