@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.ResponseObject;
 import com.example.demo.dto.RoleDto;
 import com.example.demo.expection.InternalServerException;
+import com.example.demo.response.ResponseObject;
 import com.example.demo.service.RoleService;
-import com.example.demo.util.HttpStatusCodeUtil;
 import com.example.demo.util.HttpStatusUtil;
 import com.example.demo.util.PathUtil;
 
@@ -43,7 +42,7 @@ public class RoleController {
 					ResponseEntity.status(HttpStatus.OK).body(
 								ResponseObject.builder()
 									.status(HttpStatusUtil.OK.toString())
-									.statusCode(HttpStatusCodeUtil.OK)
+									.statusCode(HttpStatusUtil.OK.getValue())
 									.message(message)
 									.data(roleDtos)
 									.build())
@@ -51,7 +50,7 @@ public class RoleController {
 					ResponseEntity.status(HttpStatus.NO_CONTENT).body(
 								ResponseObject.builder()
 									.status(HttpStatusUtil.NO_CONTENT.toString())
-									.statusCode(HttpStatusCodeUtil.NO_CONTENT)
+									.statusCode(HttpStatusUtil.NO_CONTENT.getValue())
 									.message(message)
 									.data("")
 									.build());
@@ -72,7 +71,7 @@ public class RoleController {
 					ResponseObject.builder()
 					.status(HttpStatusUtil.BAD_REQUEST.toString())
 					.message(message)
-					.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+					.statusCode(HttpStatusUtil.BAD_REQUEST.getValue())
 					.data("")
 					.build()
 				);
@@ -84,7 +83,7 @@ public class RoleController {
 						ResponseObject.builder()
 						.status(HttpStatusUtil.BAD_REQUEST.toString())
 						.message(message)
-						.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+						.statusCode(HttpStatusUtil.BAD_REQUEST.getValue())
 						.data("")
 						.build()
 					);
@@ -96,7 +95,7 @@ public class RoleController {
 						ResponseObject.builder()
 						.status(HttpStatusUtil.BAD_REQUEST.toString())
 						.message(message)
-						.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+						.statusCode(HttpStatusUtil.BAD_REQUEST.getValue())
 						.data("")
 						.build()
 					);
@@ -109,7 +108,7 @@ public class RoleController {
 					ResponseObject.builder()
 					.status(HttpStatusUtil.OK.toString())
 					.message(message)
-					.statusCode(HttpStatusCodeUtil.OK)
+					.statusCode(HttpStatusUtil.OK.getValue())
 					.data(roleDto)
 					.build()
 			);

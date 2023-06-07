@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import com.example.demo.util.HttpStatusCodeUtil;
 import com.example.demo.util.HttpStatusUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +29,7 @@ public class JwtEntryPoint implements AuthenticationEntryPoint {
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		PrintWriter out = response.getWriter();
 		out.println("{ \"status\": \"" + statusResult + "\", ");
-		out.println("\"statusCode\": \"" + HttpStatusCodeUtil.UNAUTHORIZED + "\", ");
+		out.println("\"statusCode\": \"" + HttpStatusUtil.UNAUTHORIZED.getValue() + "\", ");
 		out.println("\"message\": \"" + messageResult + "\" }");
 	}
 

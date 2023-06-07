@@ -9,8 +9,12 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.model.CustomUserDetails;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 
 @Component
 // Class này thực hiện các công việc tạo token, validate token, get email(username từ token)
@@ -19,6 +23,11 @@ public class JwtProvider {
 	
 	private final String jwtSecret = "1ac8dde22c6b454da0923af29afd67bf";
 	private final int jwtExpiration = 86400; // 1 day
+	
+	private boolean isTokenExpired(Claims claims) {
+        return claims.getExpiration().after(new Date());
+	}
+
 	
 	public String createToken(Authentication authentication) {
 		// Thực hiện lấy user từ hệ thống
@@ -29,11 +38,15 @@ public class JwtProvider {
 				.setSubject(customUserDetails.getEmail())
 				.setIssuedAt(new Date())
 				// Set thời gian sống
-				.setExpiration(new Date(new Date().getTime() + jwtExpiration * 1000)) // 1 day
-				.signWith(SignatureAlgorithm.HS256, jwtSecret)
+				.setExpiration(generateExpirationDate()) // 1 day
+				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
 		LOGGER.info(accessToken);
 		return accessToken;
+	}
+	
+	public Date generateExpirationDate() {
+		return new Date(new Date().getTime() + jwtExpiration * 1000);
 	}
 	
 	public boolean validateToken(String token) {
@@ -41,17 +54,28 @@ public class JwtProvider {
 			// Thực hiện convert token 
 			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
 			return true;
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-		}
+		}  catch (MalformedJwtException e) {
+            LOGGER.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            LOGGER.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            LOGGER.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("JWT claims string is empty: {}", e.getMessage());
+        }
 		return false;
 	}
 	
+
 	public String getSubjectFromToken(String token) {
-		String username = Jwts.parser()
-							.setSigningKey(jwtSecret)
-							.parseClaimsJws(token)
-							.getBody().getSubject();
-		return username;
+		 Claims claims = Jwts.parser()
+					.setSigningKey(jwtSecret)
+					.parseClaimsJws(token)
+					.getBody();
+		 if(claims != null && isTokenExpired(claims) ) {
+			String username = claims.getSubject();
+			return username;
+		 }
+		return null; 
 	}
 }

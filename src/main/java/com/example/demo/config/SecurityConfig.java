@@ -9,11 +9,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import com.example.demo.config.jwt.JwtEntryPoint;
 import com.example.demo.config.jwt.JwtTokenFilter;
@@ -28,6 +30,9 @@ public class SecurityConfig {
 	
 	@Autowired
 	JwtEntryPoint jwtEntryPoint;
+	
+	@Autowired
+	LogoutHandler logoutHandler;
 	
 	@Bean
 	JwtTokenFilter jwtTokenFilter() {
@@ -61,13 +66,20 @@ public class SecurityConfig {
 			// Thực hiện cho người dùng sử dụng những entrypoint bên dưới
 			.authorizeHttpRequests()
 			.requestMatchers("/api/v1/auth/**").permitAll()
-			.requestMatchers("/api/v1/roles/**").permitAll()
+			.requestMatchers("/api/v1/users/**").hasAnyAuthority("ADMIN", "MANAGER")
+			.requestMatchers("/api/v1/roles/**").hasAnyAuthority("ADMIN")
 			// Những enpoint khác cần phải xác thực thì mới có thể thao tác được
 			.anyRequest().authenticated()
 			.and()
 			// Xử lý exception nếu không có quyền truy cập
 			.exceptionHandling()
-			.authenticationEntryPoint(jwtEntryPoint);
+			.authenticationEntryPoint(jwtEntryPoint)
+			.and()
+			.logout()
+			.logoutUrl("/api/v1/auth/logout")
+			.addLogoutHandler(logoutHandler)
+			.logoutSuccessHandler((request, response, authentication) -> 
+				SecurityContextHolder.clearContext());
 		
 		return http.build();
 	}

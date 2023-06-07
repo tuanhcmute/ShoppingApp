@@ -11,13 +11,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "tbluser")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User implements Serializable{
 	private static final long serialVersionUID = 1L;
 
@@ -32,7 +36,6 @@ public class User implements Serializable{
 	
 	@Column(name = "full_name", nullable = false)
 	private String fullName;
-	
 	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "user_role", 

@@ -8,6 +8,7 @@ public class UserMapper {
 		UserDto userDto = UserDto.builder()
 							.id(user.getId())
 							.email(user.getEmail())
+							.fullName(user.getFullName())
 							.roles(user.getRoles())
 							.build();
 		return userDto;

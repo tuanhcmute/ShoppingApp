@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import com.example.demo.dto.ResponseObject;
-import com.example.demo.util.HttpStatusCodeUtil;
+import com.example.demo.response.ResponseObject;
 import com.example.demo.util.HttpStatusUtil;
 
 
@@ -31,7 +30,7 @@ public class CustomExceptionHandler {
 				.status(HttpStatusUtil.INTERNAL_SERVER_ERROR.toString())
 				.message(ex.getMessage())
 				.data("")
-				.statusCode(HttpStatusCodeUtil.INTERNAL_SERVER_ERROR)
+				.statusCode(HttpStatusUtil.INTERNAL_SERVER_ERROR.getValue())
 				.build();
 	}
 }

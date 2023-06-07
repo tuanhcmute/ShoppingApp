@@ -25,6 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		try {
 			User user = userRepository.findByEmail(username);
 			return CustomUserDetails.builder()
+					.id(user.getId())
 					.email(user.getEmail())
 					.fullName(user.getFullName())
 					.hashedPassword(user.getHashedPassword())

@@ -18,11 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.CategoryDto;
 import com.example.demo.dto.ProductDto;
-import com.example.demo.dto.ResponseObject;
 import com.example.demo.expection.InternalServerException;
+import com.example.demo.response.ResponseObject;
 import com.example.demo.service.CategoryService;
 import com.example.demo.service.ProductService;
-import com.example.demo.util.HttpStatusCodeUtil;
 import com.example.demo.util.HttpStatusUtil;
 import com.example.demo.util.PathUtil;
 
@@ -49,7 +48,7 @@ public class ProductController {
 					ResponseObject.builder()
 					.status(HttpStatusUtil.BAD_REQUEST.toString())
 					.message(message)
-					.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+					.statusCode(HttpStatusUtil.BAD_REQUEST.getValue())
 					.data("")
 					.build()
 				);
@@ -62,7 +61,7 @@ public class ProductController {
 					ResponseObject.builder()
 					.status(HttpStatusUtil.OK.toString())
 					.message(message)
-					.statusCode(HttpStatusCodeUtil.OK)
+					.statusCode(HttpStatusUtil.OK.getValue())
 					.data(productDto)
 					.build()
 				);
@@ -73,7 +72,7 @@ public class ProductController {
 				ResponseObject.builder()
 				.status(HttpStatusUtil.NOT_FOUND.toString())
 				.message(message)
-				.statusCode(HttpStatusCodeUtil.NOT_FOUND)
+				.statusCode(HttpStatusUtil.NOT_FOUND.getValue())
 				.data("")
 				.build()
 			);
@@ -93,7 +92,7 @@ public class ProductController {
 						ResponseObject.builder()
 						.status(HttpStatusUtil.BAD_REQUEST.toString())
 						.message(message)
-						.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+						.statusCode(HttpStatusUtil.BAD_REQUEST.getValue())
 						.data("")
 						.build()
 				);
@@ -104,7 +103,7 @@ public class ProductController {
 						ResponseObject.builder()
 						.status(HttpStatusUtil.BAD_REQUEST.toString())
 						.message(message)
-						.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+						.statusCode(HttpStatusUtil.BAD_REQUEST.getValue())
 						.data("")
 						.build()
 				);
@@ -115,7 +114,7 @@ public class ProductController {
 						ResponseObject.builder()
 						.status(HttpStatusUtil.BAD_REQUEST.toString())
 						.message(message)
-						.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+						.statusCode(HttpStatusUtil.BAD_REQUEST.getValue())
 						.data("")
 						.build()
 				);
@@ -127,7 +126,7 @@ public class ProductController {
 						ResponseObject.builder()
 						.status(HttpStatusUtil.NOT_FOUND.toString())
 						.message(message)
-						.statusCode(HttpStatusCodeUtil.NOT_FOUND)
+						.statusCode(HttpStatusUtil.NOT_FOUND.getValue())
 						.data("")
 						.build()
 				);
@@ -140,7 +139,7 @@ public class ProductController {
 					ResponseObject.builder()
 					.status(HttpStatusUtil.OK.toString())
 					.message(message)
-					.statusCode(HttpStatusCodeUtil.OK)
+					.statusCode(HttpStatusUtil.OK.getValue())
 					.data(productDto)
 					.build()
 			);
@@ -160,7 +159,7 @@ public class ProductController {
 					ResponseObject.builder()
 					.status(HttpStatusUtil.BAD_REQUEST.toString())
 					.message(message)
-					.statusCode(HttpStatusCodeUtil.BAD_REQUEST)
+					.statusCode(HttpStatusUtil.BAD_REQUEST.getValue())
 					.data("")
 					.build()
 				);
@@ -174,7 +173,7 @@ public class ProductController {
 					ResponseObject.builder()
 					.status(HttpStatusUtil.NOT_FOUND.toString())
 					.message(message)
-					.statusCode(HttpStatusCodeUtil.NOT_FOUND)
+					.statusCode(HttpStatusUtil.NOT_FOUND.getValue())
 					.data("")
 					.build()
 				);
@@ -184,7 +183,7 @@ public class ProductController {
 				ResponseObject.builder()
 				.status(HttpStatusUtil.OK.toString())
 				.message(message)
-				.statusCode(HttpStatusCodeUtil.OK)
+				.statusCode(HttpStatusUtil.OK.getValue())
 				.data(products)
 				.build()
 			);

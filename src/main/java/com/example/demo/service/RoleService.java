@@ -7,4 +7,5 @@ import com.example.demo.dto.RoleDto;
 public interface RoleService {
 	List<RoleDto> findAll();
 	RoleDto upsert(RoleDto roleDto);
+	RoleDto findById(String id);
 }
